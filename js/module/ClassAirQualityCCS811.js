@@ -35,13 +35,13 @@ class ClassAirQualityCCS811 extends ClassMiddleSensor {
     Start(_num_channel, _period) {
         let period = (typeof _period === 'number' & _period >= this._MinPeriod) ? _period    //частота сверяется с минимальной
                  : this._MinPeriod;
-
+        let data;
         if (!this._UsedChannels.includes(_num_channel)) this._UsedChannels.push(_num_channel); //номер канала попадает в список опрашиваемых каналов. Если интервал уже запущен с таким же периодои, то даже нет нужды его перезапускать 
         if (!this._Interval) {          //если в данный момент не ведется ни одного опроса
             this._Interval = setInterval(() => {
-                if (this._UsedChannels.includes(0)) this.Ch0_Value = this._Sensor.temp();
-                if (this._UsedChannels.includes(1)) this.Ch1_Value = this._Sensor.pressure();
-                if (this._UsedChannels.includes(2)) this.Ch2_Value = (this._CalPressure - (this.Ch1_Value * 7.501)) * 10.5;
+                data = this._Sensor.get();
+                if (this._UsedChannels.includes(0)) this.Ch0_Value = data.eCO2;
+                if (this._UsedChannels.includes(1)) this.Ch1_Value = data.TVOC;
             });
         }
     }
