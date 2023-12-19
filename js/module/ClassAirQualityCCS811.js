@@ -12,10 +12,12 @@ class ClassAirQualityCCS811 extends ClassMiddleSensor {
     constructor(_opts, _sensor_props) {
         ClassMiddleSensor.apply(this, [_opts, _sensor_props]);
         this._Name = 'BaseClassCCS811'; //переопределяем имя типа
-		this._Sensor = require('BaseClassCCS811').connect({i2c: _opts.bus, address: _opts.address});
-        this._MinPeriod = 125;
+		this._Sensor = require('BaseClassCCS811').connect({i2c: _opts.bus, options: {addr: _opts.address, mode: _opts.mode}});
+        this._MinPeriod = 250;
         this._UsedChannels = [];
         this._Interval;
+        this._Margin.temp = _opts.temp;
+        this._Margin.hum = _opts.hum;
         this.Init(_sensor_props);
     }
     /**
@@ -24,7 +26,22 @@ class ClassAirQualityCCS811 extends ClassMiddleSensor {
      */
     Init(_sensor_props) {
         super.Init(_sensor_props);
-        this._Sensor.init();
+        if (this._Margin.hum && this._Margin.temp) {
+            this.SetTempHumMargin();
+        }
+    }
+    /**
+     * @method
+     * Установка температуры и влажности для корректировки
+     * возвращаемых с датчика данных
+     * @param {Object} _margin   - Объект, содержащий поля humidity и temperature
+     */
+    SetTempHumMargin(_margin)
+    {
+        if (_margin) {
+            this._Margin = _margin;
+        }
+        this._Sensor.setEnvData(this._Margin.hum, this._Margin.temp);
     }
     /**
      * @method
@@ -42,7 +59,7 @@ class ClassAirQualityCCS811 extends ClassMiddleSensor {
                 data = this._Sensor.get();
                 if (this._UsedChannels.includes(0)) this.Ch0_Value = data.eCO2;
                 if (this._UsedChannels.includes(1)) this.Ch1_Value = data.TVOC;
-            });
+            }, period);
         }
     }
     /**
