@@ -18,6 +18,7 @@ class ClassAirQualityCCS811 extends ClassMiddleSensor {
         this._Interval;
         this._Margin.temp = _opts.temp;
         this._Margin.hum = _opts.hum;
+        this._CanRead = true;
         this.Init(_sensor_props);
     }
     /**
@@ -56,9 +57,9 @@ class ClassAirQualityCCS811 extends ClassMiddleSensor {
         if (!this._UsedChannels.includes(_num_channel)) this._UsedChannels.push(_num_channel); //номер канала попадает в список опрашиваемых каналов. Если интервал уже запущен с таким же периодои, то даже нет нужды его перезапускать 
         if (!this._Interval) {          //если в данный момент не ведется ни одного опроса
             this._Interval = setInterval(() => {
-                data = this._Sensor.get();
-                if (this._UsedChannels.includes(0)) this.Ch0_Value = data.eCO2;
-                if (this._UsedChannels.includes(1)) this.Ch1_Value = data.TVOC;
+                if (this._CanRead) data = this._Sensor.get();
+                if (this._UsedChannels.includes(0)) this.Ch0_Value = data.eCO2 | 0;
+                if (this._UsedChannels.includes(1)) this.Ch1_Value = data.TVOC | 0;
             }, period);
         }
     }
@@ -70,6 +71,20 @@ class ClassAirQualityCCS811 extends ClassMiddleSensor {
     ChangeFreq(_num_channel, freq) {
         clearInterval(this._Interval);
         setTimeout(() => this.Start(freq), this._Minfrequency);
+    }
+    /**
+     * @method
+     * Меняет режим работы датчика через 10 секунд
+     * @param {Object} _opts    - объект, содержащий новый режим датчика
+     */
+    ConfigureRegs(_opts) {
+        if (Number.isInteger(_opts.mode) && _opts.mode >= 0 && _opts.mode <= 4) {
+            this._CanRead = false;
+            setTimeout (() => {
+                this._Sensor.setMode(_opts.mode);
+            }, 10000);
+            this._CanRead = true;
+        }   
     }
     /**
      * @methhod
