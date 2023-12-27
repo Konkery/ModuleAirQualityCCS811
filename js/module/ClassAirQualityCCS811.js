@@ -12,7 +12,7 @@ class ClassAirQualityCCS811 extends ClassMiddleSensor {
     constructor(_opts, _sensor_props) {
         ClassMiddleSensor.apply(this, [_opts, _sensor_props]);
         this._Name = 'ClassAirQualityCCS811'; //переопределяем имя типа
-		this._Sensor = require('BaseClassCCS811').connect({dataPin: _opts.bus, heatPin: _opts.bus, model: 'MQ3', r0: _opts.baseline});
+		this._Sensor = require('BaseClassCCS811').connect({i2c: _opts.bus, options: {addr: _opts.address, mode: _opts.mode}});
         this._MinPeriod = 250;
         this._UsedChannels = [];
         this._Interval;
