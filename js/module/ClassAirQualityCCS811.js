@@ -16,8 +16,9 @@ class ClassAirQualityCCS811 extends ClassMiddleSensor {
         this._MinPeriod = 250;
         this._UsedChannels = [];
         this._Interval;
-        //this._Margin.temp = (_opts.temp ? _opts.temp : undefined);
-        //this._Margin.hum = (_opts.hum ? _opts.hum : undefined);
+        this._Margin = {};
+        this._Margin.temp = opts.temp;
+        this._Margin.hum = _opts.hum;
         this._CanRead = true;
         this.Init(_sensor_props);
     }
@@ -27,15 +28,15 @@ class ClassAirQualityCCS811 extends ClassMiddleSensor {
      */
     Init(_sensor_props) {
         super.Init(_sensor_props);
-        //if (this._Margin.hum && this._Margin.temp) {
-        //    this.SetTempHumMargin();
-       //}
+        if (this._Margin.hum && this._Margin.temp) {
+            this.SetTempHumMargin();
+        }
     }
     /**
      * @method
      * Установка температуры и влажности для корректировки
      * возвращаемых с датчика данных
-     * @param {Object} _margin   - Объект, содержащий поля humidity и temperature
+     * @param {Object} _margin   - Объект, содержащий поля humidity и    temperature
      */
     SetTempHumMargin(_margin)
     {
