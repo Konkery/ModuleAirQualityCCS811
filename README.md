@@ -80,4 +80,71 @@ const _opts = {
 Датчик предоставляет данные о концентрации углекислого газа в воздухе в миллионных долях (ppm), и о концентрации летучих органических веществ в миллиардных долях (ppb). Значения концентрации углекислого газа варьируются от 400ppm до 8192ppm, а для ЛОВ - от 0ppb до 1187ppb. Значения, выходящие за обозначенные отрезки приравниваются к максимальному/минимальному значению отрезка. Работая в режиме 4 датчик возвращает необработанные сырые данные о токах, проходящих через датчик - силу тока в микроамперах и текущее напряжение в вольтах.
 </div>
 
+### Примеры
+<div style = "color: #555">
+
+Фрагмент кода для вывода данных о давлении и температуре в консоль раз в одну секунду. Предполагается, что все необходимые модули уже загружены в систему:
+```js
+//Подключение необходимых модулей
+const ClassI2CBus = require("ClassBaseI2CBus.min.js");
+const err = require("ModuleAppError.min.js");
+const NumIs = require("ModuleAppMath.min.js");
+     NumIs.is(); //добавить функцию проверки целочисленных чисел в Number
+
+//Создание I2C шины
+let I2Cbus = new ClassI2CBus();
+let bus = I2Cbus.AddBus({sda: B9, scl: B8, bitrate: 400000}).IDbus;
+
+//Настройка передаваемых объектов
+const gasClass = require('ClassAirQualityCCS811.min.js');
+let opts = {pins: [P5, P6], bus: PrimaryI2C, address: 0x5A, mode: 1, quantityChannel: 2};
+let sensor_props = {
+    name: "CCS811",
+    type: "sensor",
+    channelNames: ['CO2', 'TVOC'],
+    typeInSignal: "digital",
+    typeOutSignal: "digital",
+    quantityChannel: 2,
+    busType: [ "i2c" ],
+    manufacturingData: {
+        IDManufacturing: [
+            {
+                "GasMeter": "A2224"
+            }
+        ],
+        IDsupplier: [
+            {
+                "Sensory": "5522"
+            }
+        ],
+        HelpSens: "CCS811 Air Quality"
+    }
+};
+//Создание объекта класса
+let gas = new gasClass(opts, sensor_props);
+
+const ch0 = gas.GetChannel(0);
+const ch1 = gas.GetChannel(1);
+
+//Создание каналов
+ch0.Start(1000);
+ch1.Start(1000);
+
+//Вывод данных
+setInterval(() => {
+  console.log(`CO2: ${(ch0.Value)} ppm    TVOC: ${(ch1.Value)} ppb`);
+}, 1000);
+```
+Вывод данных в консоль:
+<p align="left">
+  <img src="./res/output.png" title="hover text">
+</p>
+<div>
+
+# Зависимости
+- [ClassBaseI2CBus](https://github.com/Konkery/ModuleBaseI2CBus/blob/main/README.md)
+- [ModuleAppError](https://github.com/Konkery/ModuleAppError/blob/main/README.md)
+- [ModuleAppMath](https://github.com/Konkery/ModuleAppMath/blob/main/README.md)
+
+
 </div>
