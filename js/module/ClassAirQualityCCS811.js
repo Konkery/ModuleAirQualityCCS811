@@ -1,7 +1,7 @@
-const ClassMiddleSensor = require('ClassSensorArchitecture');
+const ClassMiddleSensor = require('ClassSensor.min.js');
 /**
  * @class
- * Модуль реализует базовые функции метеодатчика на базе чипа MQ-3,
+ * Модуль реализует базовые функции метеодатчика на базе чипа CCS811,
  * возращающего данные о качестве воздуха
  */
 class ClassAirQualityCCS811 extends ClassMiddleSensor {
@@ -12,12 +12,12 @@ class ClassAirQualityCCS811 extends ClassMiddleSensor {
     constructor(_opts, _sensor_props) {
         ClassMiddleSensor.apply(this, [_opts, _sensor_props]);
         this._Name = 'ClassAirQualityCCS811'; //переопределяем имя типа
-		this._Sensor = require('BaseClassCCS811').connect({i2c: _opts.bus, options: {addr: _opts.address, mode: _opts.mode}});
+		this._Sensor = require('BaseClassCCS811.min.js').connect(_opts.bus, {addr: _opts.address, mode: _opts.mode});
         this._MinPeriod = 250;
         this._UsedChannels = [];
         this._Interval;
-        this._Margin.temp = _opts.temp;
-        this._Margin.hum = _opts.hum;
+        //this._Margin.temp = (_opts.temp ? _opts.temp : undefined);
+        //this._Margin.hum = (_opts.hum ? _opts.hum : undefined);
         this._CanRead = true;
         this.Init(_sensor_props);
     }
@@ -27,9 +27,9 @@ class ClassAirQualityCCS811 extends ClassMiddleSensor {
      */
     Init(_sensor_props) {
         super.Init(_sensor_props);
-        if (this._Margin.hum && this._Margin.temp) {
-            this.SetTempHumMargin();
-        }
+        //if (this._Margin.hum && this._Margin.temp) {
+        //    this.SetTempHumMargin();
+       //}
     }
     /**
      * @method

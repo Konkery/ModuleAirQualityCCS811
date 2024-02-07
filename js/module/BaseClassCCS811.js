@@ -81,7 +81,7 @@ const C = {
   
   /** Set up the CCS811.
    @constructor
-   (see details at exports.connectI2C) */
+   (see details at exports.connect) */
   function CCS811(r, w, options) {
   
     this.r = (options && options.nWake) ? wrapWithnWake(options.nWake, r) : r; // read from a register
@@ -227,7 +227,7 @@ const C = {
     nWake: pin // optional - Connect a pin to the CCS811's nWake pin to the lower it's power consumption in Mode 2 or Mode 3
   }
   ``` */
-  exports.connectI2C = function(i2c, options) {
+  exports.connect = function(i2c, options) {
     var addr = (options && options.addr) || 0x5A;
     return new CCS811(function(reg, len) { // read
       i2c.writeTo(addr, reg);
