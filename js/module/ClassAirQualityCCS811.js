@@ -1,23 +1,22 @@
-const ClassMiddleSensor = require('ClassSensor.min.js');
 /**
  * @class
  * Модуль реализует базовые функции метеодатчика на базе чипа CCS811,
  * возращающего данные о качестве воздуха
  */
-class ClassAirQualityCCS811 extends ClassMiddleSensor {
+class ClassAirQualityCCS811 extends ClassSensor {
     /**
      * @constructor
-     * @param {Object} _opts   - Объект с параметрами по нотации ClassMiddleSensor
+     * @param {Object} _opts   - Объект с параметрами по нотации ClassSensor
      */
     constructor(_opts, _sensor_props) {
-        ClassMiddleSensor.apply(this, [_opts, _sensor_props]);
+        ClassSensor.apply(this, [_opts, _sensor_props]);
         this._Name = 'ClassAirQualityCCS811'; //переопределяем имя типа
-		this._Sensor = require('BaseClassCCS811.min.js').connect(_opts.bus, {addr: _opts.address, mode: _opts.mode});
+		this._Sensor = require('BaseClassCCS811.min.js').connect(_opts.bus, _opts.address, _opts.mode);
         this._MinPeriod = 250;
         this._UsedChannels = [];
         this._Interval;
         this._Margin = {};
-        this._Margin.temp = opts.temp;
+        this._Margin.temp = _opts.temp;
         this._Margin.hum = _opts.hum;
         this._CanRead = true;
         this.Init(_sensor_props);
@@ -28,6 +27,7 @@ class ClassAirQualityCCS811 extends ClassMiddleSensor {
      */
     Init(_sensor_props) {
         super.Init(_sensor_props);
+        this._Sensor.init();
         if (this._Margin.hum && this._Margin.temp) {
             this.SetTempHumMargin();
         }
